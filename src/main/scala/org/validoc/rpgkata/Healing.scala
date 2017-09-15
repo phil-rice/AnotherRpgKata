@@ -2,8 +2,10 @@ package org.validoc.rpgkata
 
 import Utilities._
 
+import scala.concurrent.Future
+
 class Heal[T](implicit applyHealing: ApplyHealing[T], capHealing: CapHealing[T], canHeal: CanHeal[T]) {
-  def apply(hitPoints: HitPoints): (T => T) = canHeal ifTrue (applyHealing(hitPoints) andThen capHealing)
+  def apply(hitPoints: HitPoints): (T => Future[T]) = canHeal ifTrue (applyHealing(hitPoints) andThen capHealing) toFutureFn
 }
 
 object Heal {

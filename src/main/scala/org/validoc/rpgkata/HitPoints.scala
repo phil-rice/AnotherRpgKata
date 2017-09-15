@@ -1,8 +1,5 @@
 package org.validoc.rpgkata
 
-
-
-
 case class HitPoints(hp: Int) {
   def +(that: HitPoints): HitPoints = HitPoints(hp + that.hp)
 

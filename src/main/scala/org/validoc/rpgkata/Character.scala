@@ -41,6 +41,7 @@ object Character {
 
 object Implicits {
 
+
   implicit class CharacterPimper(character: Character) {
     def damage(hitPoints: HitPoints)(implicit d: Damage[Character]) = d(hitPoints)(character)
 

@@ -3,7 +3,7 @@ package org.validoc.rpgkata
 import Utilities._
 
 class Heal[T](implicit applyHealing: ApplyHealing[T], capHealing: CapHealing[T], canHeal: CanHeal[T]) {
-  def apply(hitPoints: HitPoints) = canHeal ifTrue (applyHealing(hitPoints) andThen capHealing)
+  def apply(hitPoints: HitPoints): (T => T) = canHeal ifTrue (applyHealing(hitPoints) andThen capHealing)
 }
 
 object Heal {

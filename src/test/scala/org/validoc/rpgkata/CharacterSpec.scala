@@ -1,8 +1,9 @@
 package org.validoc.rpgkata
 
+import org.scalamock.scalatest.MockFactory
 import org.scalatest.{FlatSpec, Matchers}
 
-trait KataSpec extends FlatSpec with Matchers
+trait KataSpec extends FlatSpec with Matchers with MockFactory
 
 object CharacterFixture {
   import HitPointsFixture._

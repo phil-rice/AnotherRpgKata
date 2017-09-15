@@ -5,7 +5,7 @@ class DieIfNegativeHitPointsSpec extends KataSpec {
   import HitPointsFixture._
   import CharacterFixture._
 
-  val dieIfNegativeHitPoints = implicitly[DieIfNegativeHitPoints[Character]]
+  val dieIfNegativeHitPoints = implicitly[KillIfNeeded[Character]]
 
   behavior of "DieIfNegativeHitPoints"
 

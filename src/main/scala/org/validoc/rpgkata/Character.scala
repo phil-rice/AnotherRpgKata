@@ -1,12 +1,5 @@
 package org.validoc.rpgkata
 
-case class HitPoints( hp: Int) {
-  def +(that: HitPoints): HitPoints = HitPoints(hp + that.hp)
-  def -(that: HitPoints): HitPoints = HitPoints(hp - that.hp)
-  def lessThanZero: Boolean = hp < 0
-  def moreThanMax: Boolean = hp>1000
-}
-
 case class Level(l: Int)
 
 sealed trait LiveStatus
@@ -21,18 +14,15 @@ case class Monster(name: String, level: Level = Level(1), alive: LiveStatus = Al
 
 object Character {
 
-  implicit object DamageForCharacter extends Damage[Character] {
-    override def apply(t: Character, hitPoints: HitPoints)(implicit dieIfNegativeHitPoints: DieIfNegativeHitPoints[Character]) = {
-     dieIfNegativeHitPoints(t.copy(hitPoints = t.hitPoints - hitPoints))
-    }
-  }
-  implicit object HealForCharacter extends Heal[Character] {
-    override def apply(t: Character, hitPoints: HitPoints)(implicit capHealing: CapHealing[Character]) =
-        capHealing(t.copy(hitPoints=hitPoints + t.hitPoints))
-//        checkCanHeal ~>  doHealing ~> capHealing ~> recordTotalAmountHealed
+  implicit object ApplyHealingForCharacter extends ApplyHealing[Character] {
+    override def apply(hitPoints: HitPoints) = (t => t.copy(hitPoints = hitPoints + t.hitPoints))
   }
 
-  implicit object DieIfNegativeHitPointsForCharacter extends DieIfNegativeHitPoints[Character] {
+  implicit object ApplyDamageForCharacter extends ApplyDamage[Character] {
+    override def apply(v1: HitPoints) = { c: Character => c.copy(hitPoints = c.hitPoints - v1) }
+  }
+
+  implicit object KillIfNeededForCharacter$ extends KillIfNeeded[Character] {
     override def apply(v1: Character) =
       if (v1.hitPoints.lessThanZero)
         v1.copy(hitPoints = HitPoints(0), alive = Dead)
@@ -42,26 +32,19 @@ object Character {
   implicit object CapHealingForCharacter extends CapHealing[Character] {
     override def apply(v1: Character) = if (v1.hitPoints.moreThanMax) v1.copy(hitPoints = HitPoints(1000)) else v1
   }
+
+  implicit object CanHealForCharacter extends CanHeal[Character] {
+    override def apply(v1: Character) = v1.alive == Alive
+  }
+
 }
-
-trait DieIfNegativeHitPoints[T] extends (T => T)
-
-trait Damage[T] {
-  def apply(t: T, hitPoints: HitPoints)(implicit dieIfNegativeHitPoints: DieIfNegativeHitPoints[Character]): T
-}
-trait Heal[T] {
-  def apply(t: T, hitPoints: HitPoints)(implicit capHealing: CapHealing[T]): T
-}
-
-trait PreHealingCheck[T] extends (T => Boolean)
-
-trait CapHealing[T]extends (T => T)
 
 object Implicits {
 
-  implicit class CharacterPimper(character: Character)(implicit d: Damage[Character], h: Heal[Character]) {
-    def damage(hitPoints: HitPoints) = d(character, hitPoints)
-    def heal(hitPoints: HitPoints) = h(character, hitPoints)
+  implicit class CharacterPimper(character: Character) {
+    def damage(hitPoints: HitPoints)(implicit d: Damage[Character]) = d(hitPoints)(character)
+
+    def heal(hitPoints: HitPoints)(implicit h: Heal[Character]) = h(hitPoints)(character)
   }
 
 }

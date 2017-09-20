@@ -6,8 +6,8 @@ trait KillIfNeeded[T] extends (T => T)
 
 trait ApplyDamage[T] extends (HitPoints => T => T)
 
-class Damage[T](implicit applyDamage: ApplyDamage[T], dieIfNegativeHitPoints: KillIfNeeded[T]) extends (HitPoints => T => Future[T]){
-  def apply(hitPoints: HitPoints) = applyDamage(hitPoints) andThen dieIfNegativeHitPoints toFutureFn
+class Damage[T](implicit applyDamage: ApplyDamage[T], dieIfNegativeHitPoints: KillIfNeeded[T]) extends (HitPoints => T => T){
+  def apply(hitPoints: HitPoints): (T => T) = applyDamage(hitPoints) andThen dieIfNegativeHitPoints
 }
 
 object Damage {

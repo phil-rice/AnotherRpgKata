@@ -45,9 +45,9 @@ object Implicits {
 
 
   implicit class CharacterPimper(character: Character) {
-    def damage(hitPoints: HitPoints)(implicit d: Damage[Character]): Future[Character] = d(hitPoints)(character)
+    def damage(hitPoints: HitPoints)(implicit d: Damage[Character]) = d(hitPoints)(character)
 
-    def heal(hitPoints: HitPoints)(implicit h: Heal[Character]): Future[Character] = h(hitPoints)(character)
+    def heal(hitPoints: HitPoints)(implicit h: Heal[Character]) = h(hitPoints)(character)
   }
 
 }
